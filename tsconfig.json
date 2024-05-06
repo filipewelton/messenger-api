@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "baseUrl": "./",
+    "paths": {
+      "__http/*": ["./src/http/*"],
+      "__libs/*": ["./src/libs/*"],
+      "__repositories/*": ["./src/repositories/*"],
+      "__use-cases/*": ["./src/use-cases/*"],
+      "__utils/*": ["./src/utils/*"],
+      "__tests/*": ["./tests/*"],
+    },
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
