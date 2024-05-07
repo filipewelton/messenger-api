@@ -37,8 +37,7 @@ export class UsersRepository extends Repository {
       .where('id', params.id)
       .update(params.data)
       .returning('*')
-      .first()
 
-    return updatedUser!
+    return updatedUser[0]
   }
 }
