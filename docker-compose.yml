@@ -1,0 +1,9 @@
+services:
+  message_storage:
+    container_name: message_storage
+    image: redislabs/rejson:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./docker/redis.conf:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
