@@ -1,7 +1,15 @@
 import { faker } from '@faker-js/faker'
 import { execSync } from 'child_process'
 import supertest from 'supertest'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from 'vitest'
 
 import { app } from '__http/app'
 import { UsersRepository } from '__repositories/knex/users-repository'
@@ -10,13 +18,15 @@ import { createUser } from '__tests/factories/user-creation'
 import '__tests/mocks/authorization-code-flow'
 import '__tests/mocks/user-info'
 
-beforeAll(async () => {
-  await app.ready()
+beforeAll(async () => await app.ready())
+
+beforeEach(() => {
   execSync('npm run knex migrate:latest')
 })
 
-afterAll(async () => {
-  await app.close()
+afterAll(async () => await app.close())
+
+afterEach(() => {
   execSync('npm run knex migrate:rollback --all')
 })
 
@@ -64,5 +74,15 @@ describe('User update', () => {
     })
 
     expect(avatar).not.toEqual(body.user.avatar)
+  })
+})
+
+describe('User deleting', () => {
+  it('should be able to delete', async () => {
+    const repository = new UsersRepository()
+    const { id } = await createUser({ repository })
+    const { cookie } = createSession()
+
+    await supertest(app.server).delete(`/users/${id}`).set('Cookie', cookie)
   })
 })

@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { CreateUserSession } from '__use-cases/users/create-session'
+import { DeleteUser } from '__use-cases/users/delete-user'
 import { UpdateUser } from '__use-cases/users/update-user'
 import { RouteNotFoundError } from '__utils/errors/route-not-found'
 
@@ -53,4 +54,20 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
   })
 
   return reply.status(200).send({ user: updatedUser })
+}
+
+export async function del(request: FastifyRequest, reply: FastifyReply) {
+  const params = z
+    .object({
+      id: z.string().uuid(),
+    })
+    .safeParse(request.params)
+
+  if (!params.success) throw new RouteNotFoundError()
+
+  const repository = new UsersRepository()
+  const deleteUser = new DeleteUser(repository)
+
+  await deleteUser.execute(params.data.id)
+  return reply.status(204).send()
 }
