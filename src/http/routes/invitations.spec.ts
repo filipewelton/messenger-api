@@ -11,7 +11,7 @@ import {
   it,
 } from 'vitest'
 
-import { ReceiveInvitation } from '__amqp/channels/receive-invitation'
+import { AMQP } from '__amqp/amqp'
 import { app } from '__http/app'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
@@ -20,16 +20,18 @@ import { createSession } from '__tests/factories/session-creation'
 import { createUser } from '__tests/factories/user-creation'
 
 let usersRepository: UsersRepository
-let receiveInvitation: ReceiveInvitation
 let invitationRepository: InvitationsRepository
+let amqp: AMQP
 
 beforeAll(async () => await app.ready())
 
-beforeEach(() => {
+beforeEach(async () => {
   execSync('npm run knex migrate:latest')
   usersRepository = new UsersRepository()
-  receiveInvitation = new ReceiveInvitation()
   invitationRepository = new InvitationsRepository()
+  amqp = new AMQP()
+
+  await amqp.startConnection()
 })
 
 afterEach(() => {
@@ -50,9 +52,9 @@ describe('Invitation creation', () => {
     const { cookie } = createSession()
     const resolve = (invitation: string) => expect(invitation).toEqual(content)
 
-    await receiveInvitation.execute({
-      resolve,
+    await amqp.receiveExclusiveMessage({
       recipientId: recipientUserId,
+      resolve,
     })
 
     const { body } = await supertest(app.server)

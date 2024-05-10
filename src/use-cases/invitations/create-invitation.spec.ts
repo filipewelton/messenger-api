@@ -1,8 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { ReceiveInvitation } from '__amqp/channels/receive-invitation'
-import { SendInvitation } from '__amqp/channels/send-invitation'
+import { AMQP } from '__amqp/amqp'
 import { startCacheConnection } from '__libs/cache'
 import { UsersRepository } from '__repositories/in-memory/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
@@ -14,20 +13,20 @@ import { CreateInvitation } from './create-invitation'
 let usersRepository: UsersRepository
 let invitationsRepository: InvitationsRepository
 let createInvitation: CreateInvitation
-let sendInvitation: SendInvitation
-let receiveInvitation: ReceiveInvitation
+let amqp: AMQP
 
 beforeEach(async () => {
   usersRepository = new UsersRepository()
   invitationsRepository = new InvitationsRepository()
-  sendInvitation = new SendInvitation()
-  receiveInvitation = new ReceiveInvitation()
+  amqp = new AMQP()
 
   createInvitation = new CreateInvitation(
     usersRepository,
     invitationsRepository,
-    sendInvitation,
+    amqp,
   )
+
+  await amqp.startConnection()
 })
 
 afterAll(async () => {
@@ -45,25 +44,20 @@ describe('Invitation creation', () => {
       repository: usersRepository,
     })
 
-    const message = await new Promise((resolve) => {
-      receiveInvitation.execute({ recipientId, resolve }).then(async () => {
-        const { invitation } = await createInvitation.execute({
-          content: 'Hi there!',
-          recipientId,
-          senderId,
-        })
+    const message = faker.lorem.words()
+    const resolve = (receivedMessage: string) =>
+      expect(receivedMessage).toEqual(message)
 
-        expect(invitation).toEqual({
-          id: expect.any(String),
-          recipientId: expect.any(String),
-          senderId: expect.any(String),
-          content: expect.any(String),
-          createdAt: expect.any(String),
-        })
-      })
+    await amqp.receiveExclusiveMessage({
+      recipientId,
+      resolve,
     })
 
-    expect(message).toEqual('Hi there!')
+    await createInvitation.execute({
+      content: message,
+      recipientId,
+      senderId,
+    })
   })
 
   it('should not be able to create due to sender user does not exists', async () => {

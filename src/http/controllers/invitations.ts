@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { SendInvitation } from '__amqp/channels/send-invitation'
+import { AMQP } from '__amqp/amqp'
 import { ContactsRepository } from '__repositories/knex/contacts-repository'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
@@ -27,11 +27,14 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
   const invitationsRepository = new InvitationsRepository()
   const usersRepository = new UsersRepository()
-  const sendInvitation = new SendInvitation()
+  const amqp = new AMQP()
+
+  await amqp.startConnection()
+
   const useCase = new CreateInvitation(
     usersRepository,
     invitationsRepository,
-    sendInvitation,
+    amqp,
   )
 
   const { invitation } = await useCase.execute({

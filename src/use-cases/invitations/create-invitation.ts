@@ -1,4 +1,4 @@
-import { SendInvitation } from '__amqp/channels/send-invitation'
+import { AMQP } from '__amqp/amqp'
 import {
   CreationParams,
   InvitationsRepository,
@@ -12,7 +12,7 @@ export class CreateInvitation implements UseCase {
   constructor(
     private usersRepository: UsersRepository,
     private invitationsRepository: InvitationsRepository,
-    private sendInvitation: SendInvitation,
+    private amqp: AMQP,
   ) {}
 
   async execute(params: CreationParams) {
@@ -26,8 +26,8 @@ export class CreateInvitation implements UseCase {
 
     const invitation = await this.invitationsRepository.create(params)
 
-    await this.sendInvitation.execute({
-      message: params.content,
+    await this.amqp.sendExclusiveMessage({
+      message: Buffer.from(params.content),
       recipientId: params.recipientId,
     })
 
