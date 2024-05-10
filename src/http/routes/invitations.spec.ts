@@ -11,7 +11,7 @@ import {
   it,
 } from 'vitest'
 
-import { ReceiveInvitation } from '__amqp/channels/invitation-receiving'
+import { ReceiveInvitation } from '__amqp/channels/receive-invitation'
 import { app } from '__http/app'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'

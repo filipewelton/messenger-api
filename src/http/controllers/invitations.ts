@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { SendInvitation } from '__amqp/channels/invitation-sending'
+import { SendInvitation } from '__amqp/channels/send-invitation'
 import { ContactsRepository } from '__repositories/knex/contacts-repository'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'

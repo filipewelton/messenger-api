@@ -1,4 +1,4 @@
-import { SendInvitation } from '__amqp/channels/invitation-sending'
+import { SendInvitation } from '__amqp/channels/send-invitation'
 import {
   CreationParams,
   InvitationsRepository,

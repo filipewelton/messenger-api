@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { ReceiveInvitation } from '__amqp/channels/invitation-receiving'
-import { SendInvitation } from '__amqp/channels/invitation-sending'
+import { ReceiveInvitation } from '__amqp/channels/receive-invitation'
+import { SendInvitation } from '__amqp/channels/send-invitation'
 import { startCacheConnection } from '__libs/cache'
 import { UsersRepository } from '__repositories/in-memory/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'

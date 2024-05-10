@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker'
 import { describe, expect, it } from 'vitest'
 
-import { ReceiveInvitation } from './channels/invitation-receiving'
-import { SendInvitation } from './channels/invitation-sending'
+import { ReceiveInvitation } from './channels/receive-invitation'
+import { SendInvitation } from './channels/send-invitation'
 
 describe('Invitations', () => {
   it('should be able to send message', async () => {
