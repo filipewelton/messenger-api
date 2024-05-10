@@ -17,6 +17,14 @@ const schema = z.object({
   JWT_SECRET: z.string(),
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
+  REDIS_HOST: z.string(),
+  REDIS_PORT: z.coerce.number(),
+  REDIS_USERNAME: z.string(),
+  REDIS_PASSWORD: z.string(),
+  RABBITMQ_HOST: z.string(),
+  RABBITMQ_PORT: z.coerce.number(),
+  RABBITMQ_USERNAME: z.string(),
+  RABBITMQ_PASSWORD: z.string(),
 })
 
 export const env = schema.parse(process.env)

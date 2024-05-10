@@ -5,6 +5,7 @@
     "baseUrl": "./",
     "paths": {
       "__http/*": ["./src/http/*"],
+      "__amqp/*": ["./src/amqp/*"],
       "__libs/*": ["./src/libs/*"],
       "__repositories/*": ["./src/repositories/*"],
       "__use-cases/*": ["./src/use-cases/*"],
@@ -14,6 +15,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strictPropertyInitialization": false
   }
 }
