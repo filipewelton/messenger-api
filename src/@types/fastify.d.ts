@@ -3,7 +3,11 @@ import { OAuth2Namespace } from '@fastify/oauth2'
 import fastify from 'fastify'
 
 declare module 'fastify' {
-  interface FastifyInstance {
+  export interface FastifyInstance {
     githubStrategy: OAuth2Namespace
+  }
+
+  export interface FastifyRequest {
+    sessionUserId: string | null
   }
 }

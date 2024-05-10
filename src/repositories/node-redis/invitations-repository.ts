@@ -1,4 +1,3 @@
-import { startCacheConnection } from '__libs/cache'
 import { ConflictError } from '__utils/errors/conflict'
 
 import {
@@ -9,9 +8,10 @@ import {
 
 export class InvitationsRepository extends Repository {
   async create(params: CreationParams): Promise<Invitation> {
+    if (!this.connection) await this.startConnection()
+
     const id = `${params.senderId}:${params.recipientId}`
-    const cache = await startCacheConnection()
-    const hasSameKey = await cache.keys(id)
+    const hasSameKey = await this.connection.keys(id)
 
     if (hasSameKey.length !== 0) {
       throw new ConflictError('Invitation already was created.')
@@ -25,27 +25,38 @@ export class InvitationsRepository extends Repository {
       createdAt: new Date().toISOString(),
     }
 
-    await cache.json.set(id, '.', invitation)
-    await cache.expire(id, threeDaysInSeconds)
+    await this.connection.json.set(id, '.', invitation)
+    await this.connection.expire(id, threeDaysInSeconds)
 
     return invitation
   }
 
-  async delete(id: string): Promise<void> {
-    const cache = await startCacheConnection()
-    await cache.del(id)
+  async deleteByKey(key: string): Promise<void> {
+    if (!this.connection) await this.startConnection()
+    await this.connection.json.del(key)
   }
 
-  async findByUserId(id: string): Promise<Invitation[] | null> {
-    const cache = await startCacheConnection()
-    const keys = await cache.keys(`*${id}*`)
+  async findByKey(key: string): Promise<Invitation | null> {
+    if (!this.connection) await this.startConnection()
 
-    if (keys.length === 0) return null
+    const reply = await this.connection.json.get(key)
+
+    if (!reply) return null
+
+    return reply as Invitation
+  }
+
+  async findByUserId(id: string): Promise<Invitation[]> {
+    if (!this.connection) await this.startConnection()
+
+    const keys = await this.connection.keys(`*${id}*`)
+
+    if (keys.length === 0) return []
 
     const invitations: Invitation[] = []
 
     for await (const k of keys) {
-      const invitation = await cache.json.get(k)
+      const invitation = await this.connection.json.get(k)
       invitations.push(invitation as Invitation)
     }
 

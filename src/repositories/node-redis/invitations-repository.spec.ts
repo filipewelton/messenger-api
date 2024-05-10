@@ -35,7 +35,7 @@ describe('Invitation deletion', () => {
       senderId: faker.string.uuid(),
     })
 
-    await repository.delete(id)
+    await repository.deleteByKey(id)
   })
 })
 

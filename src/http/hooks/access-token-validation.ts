@@ -10,9 +10,13 @@ export async function validateAccessToken(request: FastifyRequest) {
     ''
 
   try {
-    verify(token, env.JWT_SECRET, {
+    const payload = verify(token, env.JWT_SECRET, {
       algorithms: ['HS256'],
     })
+
+    if (typeof payload === 'string') return
+
+    request.sessionUserId = payload.userId
   } catch (error) {
     throw new UnauthorizedError(error)
   }

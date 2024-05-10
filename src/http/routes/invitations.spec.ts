@@ -14,18 +14,22 @@ import {
 import { ReceiveInvitation } from '__amqp/channels/invitation-receiving'
 import { app } from '__http/app'
 import { UsersRepository } from '__repositories/knex/users-repository'
+import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
+import { createInvitation } from '__tests/factories/invitation-creation'
 import { createSession } from '__tests/factories/session-creation'
 import { createUser } from '__tests/factories/user-creation'
 
-let repository: UsersRepository
+let usersRepository: UsersRepository
 let receiveInvitation: ReceiveInvitation
+let invitationRepository: InvitationsRepository
 
 beforeAll(async () => await app.ready())
 
 beforeEach(() => {
   execSync('npm run knex migrate:latest')
-  repository = new UsersRepository()
+  usersRepository = new UsersRepository()
   receiveInvitation = new ReceiveInvitation()
+  invitationRepository = new InvitationsRepository()
 })
 
 afterEach(() => {
@@ -36,8 +40,12 @@ afterAll(async () => app.close())
 
 describe('Invitation creation', () => {
   it('should be able to create', async () => {
-    const { id: senderUserId } = await createUser({ repository })
-    const { id: recipientUserId } = await createUser({ repository })
+    const { id: senderUserId } = await createUser({
+      repository: usersRepository,
+    })
+    const { id: recipientUserId } = await createUser({
+      repository: usersRepository,
+    })
     const content = faker.lorem.words()
     const { cookie } = createSession()
     const resolve = (invitation: string) => expect(invitation).toEqual(content)
@@ -61,6 +69,37 @@ describe('Invitation creation', () => {
       senderId: expect.any(String),
       id: expect.any(String),
       createdAt: expect.any(String),
+    })
+  })
+})
+
+describe('Invitation acceptance', () => {
+  it('should be able to accept invitation', async () => {
+    const { id: senderId } = await createUser({ repository: usersRepository })
+
+    const { id: recipientId } = await createUser({
+      repository: usersRepository,
+    })
+
+    const { cookie } = createSession({ userId: recipientId })
+
+    await createInvitation({
+      recipientId,
+      senderId,
+      repository: invitationRepository,
+    })
+
+    const { status, body } = await supertest(app.server)
+      .post('/invitations/acceptance')
+      .set('Cookie', cookie)
+      .send({ recipientId, senderId })
+
+    expect(status).toEqual(201)
+
+    expect(body.contact).toEqual({
+      id: expect.any(String),
+      user1_id: expect.any(String),
+      user2_id: expect.any(String),
     })
   })
 })
