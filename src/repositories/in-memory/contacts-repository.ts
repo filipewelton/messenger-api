@@ -32,6 +32,19 @@ export class ContactsRepository extends Repository {
     return contact ?? null
   }
 
+  async findByUsersId(
+    user1Id: string,
+    user2Id: string,
+  ): Promise<Contact | null> {
+    const ids = [user1Id, user2Id]
+
+    const contact = this.db.find((contact) => {
+      return ids.includes(contact.user1_id) && ids.includes(contact.user2_id)
+    })
+
+    return contact ?? null
+  }
+
   async delete(id: string): Promise<void> {
     const index = this.db.findIndex((contact) => contact.id === id)
     delete this.db[index]

@@ -19,7 +19,6 @@ export class AcceptInvitation implements UseCase {
 
   async execute(params: Params) {
     const { recipientId, senderId } = params
-
     const senderUser = await this.usersRepository.findById(senderId)
 
     if (!senderUser) {
@@ -35,11 +34,11 @@ export class AcceptInvitation implements UseCase {
 
     await this.invitationsRepository.deleteByKey(key)
 
-    const contact = await this.contactsRepository.create({
+    const newContact = await this.contactsRepository.create({
       user1_id: senderId,
       user2_id: recipientId,
     })
 
-    return { contact }
+    return { contact: newContact }
   }
 }

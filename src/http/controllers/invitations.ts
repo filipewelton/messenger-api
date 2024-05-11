@@ -26,8 +26,9 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     })
     .parse(request.body)
 
-  const invitationsRepository = new InvitationsRepository()
   const usersRepository = new UsersRepository()
+  const invitationsRepository = new InvitationsRepository()
+  const contactsRepository = new ContactsRepository()
   const amqp = new AMQP()
 
   await amqp.startConnection()
@@ -35,6 +36,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   const useCase = new CreateInvitation(
     usersRepository,
     invitationsRepository,
+    contactsRepository,
     amqp,
   )
 

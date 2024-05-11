@@ -30,6 +30,23 @@ export class ContactsRepository extends Repository {
     return contact ?? null
   }
 
+  async findByUsersId(
+    user1Id: string,
+    user2Id: string,
+  ): Promise<Contact | null> {
+    const contact = await this.db('contacts')
+      .select('*')
+      .where((builder) => {
+        builder.where('user1_id', user1Id).and.where('user2_id', user2Id)
+      })
+      .or.where((builder) => {
+        builder.where('user1_id', user2Id).or.where('user2_id', user1Id)
+      })
+      .first()
+
+    return contact ?? null
+  }
+
   async delete(id: string): Promise<void> {
     await this.db('contacts').where('id', id).del()
   }
