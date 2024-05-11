@@ -13,6 +13,16 @@ interface MessageReceivingParams {
   resolve: (message: string) => void
 }
 
+interface GroupMessageSendingParams {
+  groupId: string
+  message: Buffer
+}
+
+interface GroupMessageReceivingParams {
+  groupId: string
+  resolve: (message: string) => void
+}
+
 export class AMQP {
   private connection: Connection | null = null
 
@@ -47,6 +57,21 @@ export class AMQP {
     if (!reply) throw new ExternalServiceError('The message was not send.')
   }
 
+  async sendMessageGroup(params: GroupMessageSendingParams) {
+    if (!this.connection) {
+      throw new ExternalServiceError('Rabbitmq is not connected.')
+    }
+
+    const { groupId: exchange, message } = params
+    const channel = await this.connection.createChannel()
+
+    await channel.assertExchange(exchange, 'fanout', { durable: false })
+
+    const reply = channel.publish(exchange, '', message)
+
+    if (!reply) throw new ExternalServiceError('The message was not send.')
+  }
+
   async receiveExclusiveMessage(params: MessageReceivingParams) {
     if (!this.connection) {
       throw new ExternalServiceError('Rabbitmq is not connected.')
@@ -67,10 +92,38 @@ export class AMQP {
       (message) => {
         if (!message) return
 
-        const invitation = Buffer.from(message.content).toString()
+        const content = Buffer.from(message.content).toString()
 
         channel.ack(message)
-        resolve(invitation)
+        resolve(content)
+      },
+      { noAck: false },
+    )
+  }
+
+  async receiveGroupMessage(params: GroupMessageReceivingParams) {
+    if (!this.connection) {
+      throw new ExternalServiceError('Rabbitmq is not connected.')
+    }
+
+    const { groupId: exchange, resolve } = params
+    const channel = await this.connection.createChannel()
+
+    await channel.assertExchange(exchange, 'fanout', { durable: false })
+
+    const { queue } = await channel.assertQueue('', { exclusive: true })
+
+    await channel.bindQueue(queue, exchange, '')
+
+    await channel.consume(
+      queue,
+      (message) => {
+        if (!message) return
+
+        const content = Buffer.from(message.content).toString()
+
+        channel.ack(message)
+        resolve(content)
       },
       { noAck: false },
     )

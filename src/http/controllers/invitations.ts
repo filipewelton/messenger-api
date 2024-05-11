@@ -7,6 +7,7 @@ import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
 import { AcceptInvitation } from '__use-cases/invitations/accept-invitation'
 import { CreateInvitation } from '__use-cases/invitations/create-invitation'
+import { RejectInvitation } from '__use-cases/invitations/reject-invitation'
 import { RouteNotFoundError } from '__utils/errors/route-not-found'
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
@@ -68,4 +69,31 @@ export async function accept(request: FastifyRequest, reply: FastifyReply) {
   })
 
   return reply.status(201).send({ contact })
+}
+
+export async function reject(request: FastifyRequest, reply: FastifyReply) {
+  const body = z
+    .object({
+      senderId: z.string().uuid(),
+    })
+    .parse(request.body)
+
+  const usersRepository = new UsersRepository()
+  const invitationsRepository = new InvitationsRepository()
+  const amqp = new AMQP()
+
+  await amqp.startConnection()
+
+  const rejectInvitation = new RejectInvitation(
+    usersRepository,
+    invitationsRepository,
+    amqp,
+  )
+
+  await rejectInvitation.execute({
+    recipientId: request.sessionUserId!,
+    senderId: body.senderId,
+  })
+
+  return reply.status(204).send()
 }

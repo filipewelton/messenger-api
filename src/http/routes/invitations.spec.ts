@@ -105,3 +105,32 @@ describe('Invitation acceptance', () => {
     })
   })
 })
+
+describe('Invitation rejection', () => {
+  it('should be able to reject invitation', async () => {
+    const { id: senderId } = await createUser({ repository: usersRepository })
+
+    const { id: recipientId } = await createUser({
+      repository: usersRepository,
+    })
+
+    const { cookie } = createSession({ userId: recipientId })
+    const resolve = (msg: string) =>
+      expect(msg).toEqual(`<${recipientId}> rejected his invitation!`)
+
+    await createInvitation({
+      recipientId,
+      senderId,
+      repository: invitationRepository,
+    })
+
+    await amqp.receiveExclusiveMessage({ recipientId, resolve })
+
+    const { status } = await supertest(app.server)
+      .delete('/invitations/acceptance')
+      .set('Cookie', cookie)
+      .send({ recipientId, senderId })
+
+    expect(status).toEqual(204)
+  })
+})
