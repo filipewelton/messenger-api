@@ -6,7 +6,7 @@
 - [x] Deve ser possível excluir a conta de usuário;
 - [x] Deve ser possível atualizar a conta de usuário;
 - [x] Deve ser possível adicionar outros usuário a lista de contatos por meio de convite;
-- [ ] Deve ser possível remover usuários da lista de contatos;
+- [x] Deve ser possível remover usuários da lista de contatos;
 - [ ] Deve ser possível criar grupos;
 - [ ] Deve ser possível excluir grupos;
 - [ ] Deve ser possível atualizar as informações do grupo;

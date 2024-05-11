@@ -10,5 +10,6 @@ export abstract class ContactsRepository {
   protected abstract db: unknown
   public abstract create(params: CreationParams): Promise<Contact>
   public abstract findManyByUserId(id: string): Promise<Contact[]>
+  public abstract findById(id: string): Promise<Contact | null>
   public abstract delete(id: string): Promise<void>
 }

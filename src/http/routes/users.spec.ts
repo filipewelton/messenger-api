@@ -11,8 +11,11 @@ import {
   it,
 } from 'vitest'
 
+import { AMQP } from '__amqp/amqp'
 import { app } from '__http/app'
+import { ContactsRepository } from '__repositories/knex/contacts-repository'
 import { UsersRepository } from '__repositories/knex/users-repository'
+import { createContact } from '__tests/factories/contact-creation'
 import { createSession } from '__tests/factories/session-creation'
 import { createUser } from '__tests/factories/user-creation'
 import '__tests/mocks/authorization-code-flow'
@@ -84,5 +87,45 @@ describe('User deleting', () => {
     const { cookie } = createSession()
 
     await supertest(app.server).delete(`/users/${id}`).set('Cookie', cookie)
+  })
+})
+
+describe('Removing user from contacts', () => {
+  let amqp: AMQP
+  let usersRepository: UsersRepository
+  let contactsRepository: ContactsRepository
+
+  beforeEach(async () => {
+    amqp = new AMQP()
+    usersRepository = new UsersRepository()
+    contactsRepository = new ContactsRepository()
+
+    await amqp.startConnection()
+  })
+
+  it('should be able to remove a user from contacts', async () => {
+    const { id: user1Id } = await createUser({ repository: usersRepository })
+    const { id: user2Id } = await createUser({ repository: usersRepository })
+    const { cookie } = createSession({ userId: user1Id })
+
+    const { id: contactId } = await createContact({
+      repository: contactsRepository,
+      user1Id,
+      user2Id,
+    })
+
+    const resolve = (msg: string) =>
+      expect(msg).toEqual(`<${user1Id}> removed you from his contacts.`)
+
+    await amqp.receiveExclusiveMessage({
+      resolve,
+      recipientId: user2Id,
+    })
+
+    const { status } = await supertest(app.server)
+      .delete(`/users/contacts/${contactId}`)
+      .set('Cookie', cookie)
+
+    expect(status).toEqual(204)
   })
 })

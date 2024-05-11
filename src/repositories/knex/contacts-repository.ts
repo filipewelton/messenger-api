@@ -21,6 +21,15 @@ export class ContactsRepository extends Repository {
       .or.where('user2_id', id)
   }
 
+  async findById(id: string): Promise<Contact | null> {
+    const contact = await this.db('contacts')
+      .select('*')
+      .where('id', id)
+      .first()
+
+    return contact ?? null
+  }
+
   async delete(id: string): Promise<void> {
     await this.db('contacts').where('id', id).del()
   }

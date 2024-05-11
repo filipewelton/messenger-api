@@ -1,9 +1,12 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
+import { AMQP } from '__amqp/amqp'
+import { ContactsRepository } from '__repositories/knex/contacts-repository'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { CreateUserSession } from '__use-cases/users/create-session'
 import { DeleteUser } from '__use-cases/users/delete-user'
+import { RemoveUserFromContacts } from '__use-cases/users/remove-user-from-contacts'
 import { UpdateUser } from '__use-cases/users/update-user'
 import { RouteNotFoundError } from '__utils/errors/route-not-found'
 
@@ -69,5 +72,32 @@ export async function del(request: FastifyRequest, reply: FastifyReply) {
   const deleteUser = new DeleteUser(repository)
 
   await deleteUser.execute(params.data.id)
+  return reply.status(204).send()
+}
+
+export async function removeUserFromContact(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const params = z
+    .object({
+      id: z.string(),
+    })
+    .safeParse(request.params)
+
+  if (!params.success) throw new RouteNotFoundError()
+
+  const contactsRepository = new ContactsRepository()
+  const amqp = new AMQP()
+
+  await amqp.startConnection()
+
+  const useCase = new RemoveUserFromContacts(contactsRepository, amqp)
+
+  await useCase.execute({
+    contactId: params.data.id,
+    sessionUserId: request.sessionUserId!,
+  })
+
   return reply.status(204).send()
 }
