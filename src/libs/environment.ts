@@ -25,6 +25,8 @@ const schema = z.object({
   RABBITMQ_PORT: z.coerce.number(),
   RABBITMQ_USERNAME: z.string(),
   RABBITMQ_PASSWORD: z.string(),
+  STORAGE_SERVICE_HOST: z.string(),
+  STORAGE_SERVICE_PORT: z.coerce.number(),
 })
 
 export const env = schema.parse(process.env)
