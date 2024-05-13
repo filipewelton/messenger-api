@@ -68,8 +68,9 @@ export async function del(request: FastifyRequest, reply: FastifyReply) {
 
   if (!params.success) throw new RouteNotFoundError()
 
-  const repository = new UsersRepository()
-  const deleteUser = new DeleteUser(repository)
+  const usersRepository = new UsersRepository()
+  const contactsRepository = new ContactsRepository()
+  const deleteUser = new DeleteUser(usersRepository, contactsRepository)
 
   await deleteUser.execute(params.data.id)
   return reply.status(204).send()
