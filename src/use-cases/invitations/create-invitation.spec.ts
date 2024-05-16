@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { startCacheConnection } from '__libs/cache'
 import { ContactsRepository } from '__repositories/in-memory/contacts-repository'
 import { UsersRepository } from '__repositories/in-memory/users-repository'
@@ -17,22 +17,22 @@ let usersRepository: UsersRepository
 let invitationsRepository: InvitationsRepository
 let contactsRepository: ContactsRepository
 let createInvitation: CreateInvitation
-let amqp: AMQP
+let messageBroker: MessageBroker
 
 beforeEach(async () => {
   usersRepository = new UsersRepository()
   invitationsRepository = new InvitationsRepository()
   contactsRepository = new ContactsRepository()
-  amqp = new AMQP()
+  messageBroker = new MessageBroker()
 
   createInvitation = new CreateInvitation(
     usersRepository,
     invitationsRepository,
     contactsRepository,
-    amqp,
+    messageBroker,
   )
 
-  await amqp.startConnection()
+  await messageBroker.open()
 })
 
 afterAll(async () => {
@@ -51,12 +51,12 @@ describe('Invitation creation', () => {
     })
 
     const message = faker.lorem.words()
-    const resolve = (receivedMessage: string) =>
+    const resolver = (receivedMessage: string) =>
       expect(receivedMessage).toEqual(message)
 
-    await amqp.receiveExclusiveMessage({
+    await messageBroker.receive({
       recipientId,
-      resolve,
+      resolver,
     })
 
     await createInvitation.execute({

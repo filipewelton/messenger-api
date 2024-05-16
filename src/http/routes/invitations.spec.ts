@@ -11,7 +11,7 @@ import {
   it,
 } from 'vitest'
 
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { app } from '__http/app'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
@@ -21,17 +21,18 @@ import { createUser } from '__tests/factories/user-creation'
 
 let usersRepository: UsersRepository
 let invitationRepository: InvitationsRepository
-let amqp: AMQP
+let messageBroker: MessageBroker
 
 beforeAll(async () => await app.ready())
 
 beforeEach(async () => {
   execSync('npm run knex migrate:latest')
+
   usersRepository = new UsersRepository()
   invitationRepository = new InvitationsRepository()
-  amqp = new AMQP()
+  messageBroker = new MessageBroker()
 
-  await amqp.startConnection()
+  await messageBroker.open()
 })
 
 afterEach(() => {
@@ -50,11 +51,11 @@ describe('Invitation creation', () => {
     })
     const content = faker.lorem.words()
     const { cookie } = createSession()
-    const resolve = (invitation: string) => expect(invitation).toEqual(content)
+    const resolver = (invitation: string) => expect(invitation).toEqual(content)
 
-    await amqp.receiveExclusiveMessage({
+    await messageBroker.receive({
       recipientId: recipientUserId,
-      resolve,
+      resolver,
     })
 
     const { body } = await supertest(app.server)
@@ -115,7 +116,7 @@ describe('Invitation rejection', () => {
     })
 
     const { cookie } = createSession({ userId: recipientId })
-    const resolve = (msg: string) =>
+    const resolver = (msg: string) =>
       expect(msg).toEqual(`<${recipientId}> rejected his invitation!`)
 
     await createInvitation({
@@ -124,7 +125,7 @@ describe('Invitation rejection', () => {
       repository: invitationRepository,
     })
 
-    await amqp.receiveExclusiveMessage({ recipientId, resolve })
+    await messageBroker.receive({ recipientId, resolver })
 
     const { status } = await supertest(app.server)
       .delete('/invitations/acceptance')

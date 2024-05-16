@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { ContactsRepository } from '__repositories/knex/contacts-repository'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { CreateUserSession } from '__use-cases/users/create-session'
@@ -89,9 +89,9 @@ export async function removeUserFromContact(
   if (!params.success) throw new RouteNotFoundError()
 
   const contactsRepository = new ContactsRepository()
-  const amqp = new AMQP()
+  const amqp = new MessageBroker()
 
-  await amqp.startConnection()
+  await amqp.open()
 
   const useCase = new RemoveUserFromContacts(contactsRepository, amqp)
 

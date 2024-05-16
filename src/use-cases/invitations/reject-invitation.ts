@@ -1,4 +1,4 @@
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { InvitationsRepository } from '__repositories/invitations-repository'
 import { UsersRepository } from '__repositories/users-repository'
 import { ResourceNotFoundError } from '__utils/errors/resource-not-found'
@@ -14,7 +14,7 @@ export class RejectInvitation implements UseCase {
   constructor(
     private usersRepository: UsersRepository,
     private invitationsRepository: InvitationsRepository,
-    private amqp: AMQP,
+    private messageBroker: MessageBroker,
   ) {}
 
   async execute(params: Params) {
@@ -36,7 +36,7 @@ export class RejectInvitation implements UseCase {
 
     const message = `<${recipientId}> rejected his invitation!`
 
-    await this.amqp.sendExclusiveMessage({
+    await this.messageBroker.send({
       recipientId,
       message: Buffer.from(message),
     })

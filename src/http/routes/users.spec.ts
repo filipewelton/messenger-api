@@ -11,7 +11,7 @@ import {
   it,
 } from 'vitest'
 
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { app } from '__http/app'
 import { ContactsRepository } from '__repositories/knex/contacts-repository'
 import { UsersRepository } from '__repositories/knex/users-repository'
@@ -91,16 +91,16 @@ describe('User deleting', () => {
 })
 
 describe('Removing user from contacts', () => {
-  let amqp: AMQP
+  let messageBroker: MessageBroker
   let usersRepository: UsersRepository
   let contactsRepository: ContactsRepository
 
   beforeEach(async () => {
-    amqp = new AMQP()
+    messageBroker = new MessageBroker()
     usersRepository = new UsersRepository()
     contactsRepository = new ContactsRepository()
 
-    await amqp.startConnection()
+    await messageBroker.open()
   })
 
   it('should be able to remove a user from contacts', async () => {
@@ -114,11 +114,11 @@ describe('Removing user from contacts', () => {
       user2Id,
     })
 
-    const resolve = (msg: string) =>
+    const resolver = (msg: string) =>
       expect(msg).toEqual(`<${user1Id}> removed you from his contacts.`)
 
-    await amqp.receiveExclusiveMessage({
-      resolve,
+    await messageBroker.receive({
+      resolver,
       recipientId: user2Id,
     })
 

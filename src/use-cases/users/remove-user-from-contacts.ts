@@ -1,4 +1,4 @@
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { ContactsRepository } from '__repositories/contacts-repository'
 import { ResourceNotFoundError } from '__utils/errors/resource-not-found'
 import { UnauthorizedError } from '__utils/errors/unauthorized'
@@ -13,7 +13,7 @@ interface Params {
 export class RemoveUserFromContacts implements UseCase {
   constructor(
     private contactsRepository: ContactsRepository,
-    private amqp: AMQP,
+    private messageBroker: MessageBroker,
   ) {}
 
   async execute(params: Params) {
@@ -38,7 +38,7 @@ export class RemoveUserFromContacts implements UseCase {
     const recipientId =
       sessionUserId === contact.user1_id ? contact.user2_id : contact.user1_id
 
-    await this.amqp.sendExclusiveMessage({
+    await this.messageBroker.send({
       recipientId,
       message: Buffer.from(message),
     })

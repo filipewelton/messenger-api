@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { AMQP } from '__amqp/amqp'
+import { MessageBroker } from '__amqp/message-broker'
 import { CacheClient, startCacheConnection } from '__libs/cache'
 import { UsersRepository } from '__repositories/in-memory/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
@@ -12,18 +12,23 @@ import { RejectInvitation } from './reject-invitation'
 
 let usersRepository: UsersRepository
 let invitationsRepository: InvitationsRepository
-let amqp: AMQP
+let messageBroker: MessageBroker
 let cache: CacheClient
 let sut: RejectInvitation
 
 beforeEach(async () => {
   usersRepository = new UsersRepository()
   invitationsRepository = new InvitationsRepository()
-  amqp = new AMQP()
+  messageBroker = new MessageBroker()
   cache = await startCacheConnection()
-  sut = new RejectInvitation(usersRepository, invitationsRepository, amqp)
 
-  await amqp.startConnection()
+  sut = new RejectInvitation(
+    usersRepository,
+    invitationsRepository,
+    messageBroker,
+  )
+
+  await messageBroker.open()
 })
 
 afterAll(async () => {
@@ -41,7 +46,7 @@ describe('Invitation rejection', () => {
     })
 
     const message = faker.lorem.words()
-    const resolve = (msg: string) => expect(msg).toEqual(message)
+    const resolver = (msg: string) => expect(msg).toEqual(message)
 
     await createInvitation({
       recipientId,
@@ -49,9 +54,9 @@ describe('Invitation rejection', () => {
       repository: invitationsRepository,
     })
 
-    await amqp.receiveExclusiveMessage({
+    await messageBroker.receive({
       recipientId,
-      resolve,
+      resolver,
     })
 
     await sut.execute({ recipientId, senderId })
