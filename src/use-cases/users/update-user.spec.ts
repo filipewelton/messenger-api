@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import { execSync } from 'child_process'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { UsersRepository } from '__repositories/in-memory/users-repository'
@@ -18,8 +17,6 @@ beforeEach(() => {
 
 describe('User update', () => {
   it('should be able to update', async () => {
-    execSync('npm run knex migrate:latest')
-
     const { id, name } = await createUser({ repository })
 
     const { user: updatedUser } = await updateUser.execute({
@@ -30,7 +27,6 @@ describe('User update', () => {
     })
 
     expect(name).not.toEqual(updatedUser.name)
-    execSync('npm run knex migrate:rollback --all')
   })
 
   it('should not be able to update due to inexistent id', async () => {

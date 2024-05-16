@@ -1,6 +1,5 @@
-import { execSync } from 'child_process'
 import { FastifyRequest } from 'fastify'
-import { afterEach, beforeEach, expect, it } from 'vitest'
+import { beforeEach, expect, it } from 'vitest'
 
 import { UsersRepository } from '__repositories/in-memory/users-repository'
 import '__tests/mocks/authorization-code-flow'
@@ -12,14 +11,8 @@ let repository: UsersRepository
 let useCase: CreateUserSession
 
 beforeEach(() => {
-  execSync('npm run knex migrate:latest')
-
   repository = new UsersRepository()
   useCase = new CreateUserSession(repository)
-})
-
-afterEach(() => {
-  execSync('npm run knex migrate:rollback --all')
 })
 
 it('should be able to create', async () => {

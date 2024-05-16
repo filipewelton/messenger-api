@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { execSync } from 'child_process'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { GroupMembersRepository } from '__repositories/in-memory/group-members-repository'
 import { GroupsRepository } from '__repositories/in-memory/groups-repository'
@@ -14,15 +13,9 @@ let groupMembersRepository: GroupMembersRepository
 let sut: CreateGroup
 
 beforeEach(() => {
-  execSync('npm run knex migrate:latest')
-
   groupsRepository = new GroupsRepository()
   groupMembersRepository = new GroupMembersRepository()
   sut = new CreateGroup(groupsRepository, groupMembersRepository)
-})
-
-afterEach(() => {
-  execSync('npm run knex migrate:rollback --all')
 })
 
 describe('Group creation', () => {

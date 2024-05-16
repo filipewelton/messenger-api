@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { afterEach } from 'node:test'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { MessageBroker } from '__amqp/message-broker'
@@ -34,6 +35,8 @@ beforeEach(async () => {
 
   await messageBroker.open()
 })
+
+afterEach(async () => await messageBroker.close())
 
 afterAll(async () => {
   const cache = await startCacheConnection()

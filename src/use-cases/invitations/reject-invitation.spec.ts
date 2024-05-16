@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { MessageBroker } from '__amqp/message-broker'
@@ -45,8 +44,8 @@ describe('Invitation rejection', () => {
       repository: usersRepository,
     })
 
-    const message = faker.lorem.words()
-    const resolver = (msg: string) => expect(msg).toEqual(message)
+    const resolver = (msg: string) =>
+      expect(msg).toEqual(`<${recipientId}> rejected his invitation!`)
 
     await createInvitation({
       recipientId,

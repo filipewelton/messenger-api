@@ -46,9 +46,11 @@ describe('Invitation creation', () => {
     const { id: senderUserId } = await createUser({
       repository: usersRepository,
     })
+
     const { id: recipientUserId } = await createUser({
       repository: usersRepository,
     })
+
     const content = faker.lorem.words()
     const { cookie } = createSession()
     const resolver = (invitation: string) => expect(invitation).toEqual(content)
