@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import { execSync } from 'child_process'
 import supertest from 'supertest'
 import {
   afterAll,
@@ -26,8 +25,6 @@ let messageBroker: MessageBroker
 beforeAll(async () => await app.ready())
 
 beforeEach(async () => {
-  execSync('npm run knex migrate:latest')
-
   usersRepository = new UsersRepository()
   invitationRepository = new InvitationsRepository()
   messageBroker = new MessageBroker()
@@ -35,11 +32,9 @@ beforeEach(async () => {
   await messageBroker.open()
 })
 
-afterEach(() => {
-  execSync('npm run knex migrate:rollback --all')
-})
+afterEach(async () => await messageBroker.close())
 
-afterAll(async () => app.close())
+afterAll(async () => await app.close())
 
 describe('Invitation creation', () => {
   it('should be able to create', async () => {

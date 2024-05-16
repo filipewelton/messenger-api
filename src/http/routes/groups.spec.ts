@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import { execSync } from 'child_process'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
@@ -14,19 +13,13 @@ import { createUser } from '__tests/factories/user-creation'
 
 let usersRepository: UsersRepository
 
-beforeAll(async () => {
-  await app.ready()
-  execSync('npm run knex migrate:latest')
-})
+beforeAll(async () => await app.ready())
 
 beforeEach(() => {
   usersRepository = new UsersRepository()
 })
 
-afterAll(async () => {
-  await app.close()
-  execSync('npm run knex migrate:rollback --all')
-})
+afterAll(async () => await app.close())
 
 describe('Group creation', () => {
   it('should be able to create group', async () => {
@@ -69,5 +62,38 @@ describe('Group deletion', () => {
       .set('Cookie', cookie)
 
     expect(status).toEqual(204)
+  })
+})
+
+describe('Group update', () => {
+  it('should be able to update group', async () => {
+    const { id: userId } = await createUser({ repository: usersRepository })
+    const { cookie } = createSession({ userId })
+    const groupsRepository = new GroupsRepository()
+    const groupMemberRepository = new GroupMembersRepository()
+    const { id: groupId } = await createGroup({ repository: groupsRepository })
+    const name = faker.lorem.word()
+    const cover = faker.internet.url()
+    const description = faker.lorem.words()
+
+    await createGroupMember({
+      groupId,
+      userId,
+      repository: groupMemberRepository,
+    })
+
+    const { status, body } = await supertest(app.server)
+      .patch(`/groups/${groupId}`)
+      .set('Cookie', cookie)
+      .send({ name, cover, description })
+
+    expect(status).toEqual(200)
+
+    expect(body.group).toEqual({
+      id: expect.any(String),
+      name,
+      cover,
+      description,
+    })
   })
 })

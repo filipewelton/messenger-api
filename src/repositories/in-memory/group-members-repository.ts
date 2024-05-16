@@ -25,7 +25,10 @@ export class GroupMembersRepository extends Repository {
   }
 
   async findByUserId(id: string): Promise<GroupMember | null> {
-    const groupMember = this.db.find((groupMember) => groupMember.id === id)
+    const groupMember = this.db.find(
+      (groupMember) => groupMember.user_id === id,
+    )
+
     return groupMember ?? null
   }
 

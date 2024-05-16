@@ -1,15 +1,6 @@
 import { faker } from '@faker-js/faker'
-import { execSync } from 'child_process'
 import supertest from 'supertest'
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { MessageBroker } from '__amqp/message-broker'
 import { app } from '__http/app'
@@ -21,17 +12,11 @@ import { createUser } from '__tests/factories/user-creation'
 import '__tests/mocks/authorization-code-flow'
 import '__tests/mocks/user-info'
 
-beforeAll(async () => await app.ready())
-
-beforeEach(() => {
-  execSync('npm run knex migrate:latest')
+beforeAll(async () => {
+  await app.ready()
 })
 
 afterAll(async () => await app.close())
-
-afterEach(() => {
-  execSync('npm run knex migrate:rollback --all')
-})
 
 describe('Session creation', () => {
   it('should be able to create', async () => {
@@ -91,19 +76,10 @@ describe('User deleting', () => {
 })
 
 describe('Removing user from contacts', () => {
-  let messageBroker: MessageBroker
-  let usersRepository: UsersRepository
-  let contactsRepository: ContactsRepository
-
-  beforeEach(async () => {
-    messageBroker = new MessageBroker()
-    usersRepository = new UsersRepository()
-    contactsRepository = new ContactsRepository()
-
-    await messageBroker.open()
-  })
-
   it('should be able to remove a user from contacts', async () => {
+    const messageBroker = new MessageBroker()
+    const usersRepository = new UsersRepository()
+    const contactsRepository = new ContactsRepository()
     const { id: user1Id } = await createUser({ repository: usersRepository })
     const { id: user2Id } = await createUser({ repository: usersRepository })
     const { cookie } = createSession({ userId: user1Id })
@@ -116,6 +92,8 @@ describe('Removing user from contacts', () => {
 
     const resolver = (msg: string) =>
       expect(msg).toEqual(`<${user1Id}> removed you from his contacts.`)
+
+    await messageBroker.open()
 
     await messageBroker.receive({
       resolver,

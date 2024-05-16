@@ -24,7 +24,7 @@ export class GroupMembersRepository extends Repository {
   async findByUserId(id: string): Promise<GroupMember | null> {
     const groupMember = await this.db('groupMembers')
       .select('*')
-      .where('id', id)
+      .where('user_id', id)
       .first()
 
     return groupMember ?? null
