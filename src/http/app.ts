@@ -7,6 +7,7 @@ import { CustomError } from '__utils/errors/custom-error'
 import { parseZodError } from '__utils/zod-parser'
 
 import { githubStrategy } from './oauth-strategies/github'
+import { groupsRoutes } from './routes/groups'
 import { invitationsRoutes } from './routes/invitations'
 import { usersRoutes } from './routes/users'
 
@@ -16,6 +17,7 @@ app.register(cookies)
 app.register(oauth2, githubStrategy)
 app.register(usersRoutes, { prefix: 'users' })
 app.register(invitationsRoutes, { prefix: 'invitations' })
+app.register(groupsRoutes, { prefix: 'groups' })
 
 app.setErrorHandler((error, _request, reply) => {
   if (error instanceof CustomError) {
