@@ -23,7 +23,10 @@ export abstract class GroupMembersRepository {
 
   public abstract delete(id: string): Promise<void>
 
-  public abstract findByUserId(id: string): Promise<GroupMember | null>
+  public abstract findByUserInGroup(
+    userId: string,
+    groupId: string,
+  ): Promise<GroupMember | null>
 
   public abstract findManyByGroupId(id: string): Promise<GroupMember[]>
 

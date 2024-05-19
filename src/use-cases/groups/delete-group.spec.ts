@@ -22,14 +22,18 @@ beforeEach(() => {
 describe('Group deletion', () => {
   it('should be able to delete', async () => {
     const { id: groupId } = await createGroup({ repository: groupsRepository })
+    const userId = faker.string.uuid()
 
     await createGroupMember({
       groupId,
-      userId: faker.string.uuid(),
+      userId,
       repository: groupMembersRepository,
     })
 
-    await sut.execute(groupId)
+    await sut.execute({
+      groupId,
+      sessionUserId: userId,
+    })
 
     const groupsSearchResult = await groupsRepository.findById(groupId)
 
@@ -41,7 +45,14 @@ describe('Group deletion', () => {
   })
 
   it('should not be able to delete due to id not found', async () => {
-    const id = faker.string.uuid()
-    expect(sut.execute(id)).rejects.toBeInstanceOf(ResourceNotFoundError)
+    const groupId = faker.string.uuid()
+    const sessionUserId = faker.string.uuid()
+
+    expect(
+      sut.execute({
+        groupId,
+        sessionUserId,
+      }),
+    ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })
 })

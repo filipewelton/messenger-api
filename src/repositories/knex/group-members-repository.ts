@@ -21,10 +21,14 @@ export class GroupMembersRepository extends Repository {
     await this.db('groupMembers').where('id', id).del()
   }
 
-  async findByUserId(id: string): Promise<GroupMember | null> {
+  async findByUserInGroup(
+    userId: string,
+    groupId: string,
+  ): Promise<GroupMember | null> {
     const groupMember = await this.db('groupMembers')
       .select('*')
-      .where('user_id', id)
+      .where('user_id', userId)
+      .and.where('group_id', groupId)
       .first()
 
     return groupMember ?? null

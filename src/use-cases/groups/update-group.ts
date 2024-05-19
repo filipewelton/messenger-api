@@ -26,12 +26,18 @@ export class UpdateGroup implements UseCase {
 
     if (!group) throw new ResourceNotFoundError('Group not found.')
 
-    const groupMember =
-      await this.groupMembersRepository.findByUserId(sessionUserId)
+    const admin = await this.groupMembersRepository.findByUserInGroup(
+      sessionUserId,
+      group.id,
+    )
 
-    if (!groupMember) throw new ResourceNotFoundError('Member not found.')
+    if (!admin) {
+      throw new UnauthorizedError(
+        'You do not have permission for this resource.',
+      )
+    }
 
-    if (groupMember.role === 'member' || groupMember.group_id !== group.id) {
+    if (admin.role === 'member' || admin.group_id !== group.id) {
       throw new UnauthorizedError(
         'You do not have permission for this resource.',
       )

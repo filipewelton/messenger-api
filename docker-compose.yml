@@ -1,6 +1,6 @@
 services:
-  cache:
-    container_name: cache
+  message-api-cache:
+    container_name: message-api-cache
     image: redislabs/rejson:latest
     ports:
       - 6379:6379
@@ -8,8 +8,8 @@ services:
       - ./docker/redis.conf:/etc/redis/redis.conf
     command: redis-server /etc/redis/redis.conf
 
-  message-broker:
-    container_name: message-broker
+  message-api-message-broker:
+    container_name: message-api-message-broker
     image: rabbitmq:3.13-management
     ports:
       - 5672:5672

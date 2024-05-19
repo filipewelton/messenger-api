@@ -24,10 +24,13 @@ export class GroupMembersRepository extends Repository {
     this.db = this.db.filter((member) => member.id !== id)
   }
 
-  async findByUserId(id: string): Promise<GroupMember | null> {
-    const groupMember = this.db.find(
-      (groupMember) => groupMember.user_id === id,
-    )
+  async findByUserInGroup(
+    userId: string,
+    groupId: string,
+  ): Promise<GroupMember | null> {
+    const groupMember = this.db.find((member) => {
+      return member.group_id === groupId && member.user_id === userId
+    })
 
     return groupMember ?? null
   }

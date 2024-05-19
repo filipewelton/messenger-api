@@ -40,7 +40,10 @@ export async function del(request: FastifyRequest, reply: FastifyReply) {
   const groupMembersRepository = new GroupMembersRepository()
   const deleteGroup = new DeleteGroup(groupsRepository, groupMembersRepository)
 
-  await deleteGroup.execute(params.data.id)
+  await deleteGroup.execute({
+    groupId: params.data.id,
+    sessionUserId: request.sessionUserId!,
+  })
 
   return reply.status(204).send()
 }
