@@ -43,6 +43,11 @@ export class GroupMembersRepository extends Repository {
     return groupMember
   }
 
+  async findById(id: string): Promise<GroupMember | null> {
+    const groupMember = this.db.find((member) => member.id === id)
+    return groupMember ?? null
+  }
+
   async update(params: GroupMemberUpdateParams): Promise<GroupMember> {
     const index = this.db.findIndex(
       (groupMember) => groupMember.id === params.id,

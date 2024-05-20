@@ -55,3 +55,34 @@ describe('Adding member to the group', () => {
     })
   })
 })
+
+describe('Removing member to the group', () => {
+  it('should be able to remove a member to the group', async () => {
+    const { id: groupId } = await createGroup({ repository: groupsRepository })
+    const sessionUserId = faker.string.uuid()
+    const { cookie } = createSession({ userId: sessionUserId })
+
+    await createGroupMember({
+      groupId,
+      repository: groupMembersRepository,
+      userId: sessionUserId,
+      role: 'admin',
+    })
+
+    const { id: userId } = await createUser({ repository: usersRepository })
+
+    const { id: memberId } = await createGroupMember({
+      groupId,
+      userId,
+      repository: groupMembersRepository,
+      role: 'member',
+    })
+
+    const { status } = await supertest(app.server)
+      .delete(`/groups/members/${memberId}`)
+      .set('Cookie', cookie)
+      .send({ groupId })
+
+    expect(status).toEqual(204)
+  })
+})
