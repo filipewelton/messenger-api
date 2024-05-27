@@ -13,7 +13,7 @@
 - [x] Deve ser possível adicionar usuário a um grupo;
 - [x] Deve ser possível remover um usuário de um grupo;
 - [ ] Deve ser possível transferir a administração de um grupo para outro usuário;
-- [ ] Deve ser possível sair de um grupo;
+- [x] Deve ser possível sair de um grupo;
 - [ ] Deve ser possível enviar mensagens de texto;
 - [ ] Deve ser possível enviar arquivos;
 - [ ] Deve ser possível identificar o status de uma mensagem;

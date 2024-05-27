@@ -41,7 +41,7 @@ describe('Adding member to the group', () => {
     const { id: userId } = await createUser({ repository: usersRepository })
 
     const { status, body } = await supertest(app.server)
-      .post(`/groups/members/${groupId}`)
+      .post(`/groups/${groupId}/members`)
       .set('Cookie', cookie)
       .send({ userId })
 
@@ -79,7 +79,28 @@ describe('Removing member to the group', () => {
     })
 
     const { status } = await supertest(app.server)
-      .delete(`/groups/members/${memberId}`)
+      .delete(`/groups/${groupId}/members/${memberId}`)
+      .set('Cookie', cookie)
+
+    expect(status).toEqual(204)
+  })
+})
+
+describe('Leave the group', () => {
+  it('should be able to leave the group', async () => {
+    const { id: groupId } = await createGroup({ repository: groupsRepository })
+    const sessionUserId = faker.string.uuid()
+    const { cookie } = createSession({ userId: sessionUserId })
+
+    await createGroupMember({
+      groupId,
+      repository: groupMembersRepository,
+      userId: sessionUserId,
+      role: 'member',
+    })
+
+    const { status } = await supertest(app.server)
+      .delete(`/groups/${groupId}/members/leave`)
       .set('Cookie', cookie)
       .send({ groupId })
 
