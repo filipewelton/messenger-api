@@ -107,3 +107,39 @@ describe('Leave the group', () => {
     expect(status).toEqual(204)
   })
 })
+
+describe('Group administration transfer', () => {
+  it('should be able to transfer group administration', async () => {
+    const { id: groupId } = await createGroup({ repository: groupsRepository })
+    const sessionUserId = faker.string.uuid()
+    const { cookie } = createSession({ userId: sessionUserId })
+
+    await createGroupMember({
+      groupId,
+      repository: groupMembersRepository,
+      userId: sessionUserId,
+      role: 'admin',
+    })
+
+    const { id: memberId } = await createGroupMember({
+      groupId,
+      repository: groupMembersRepository,
+      userId: faker.string.uuid(),
+      role: 'member',
+    })
+
+    const { status, body } = await supertest(app.server)
+      .patch(`/groups/${groupId}/members/transfer`)
+      .set('Cookie', cookie)
+      .send({ memberId })
+
+    expect(status).toEqual(200)
+
+    expect(body.groupAdmin).toEqual(
+      expect.objectContaining({
+        id: memberId,
+        role: 'admin',
+      }),
+    )
+  })
+})

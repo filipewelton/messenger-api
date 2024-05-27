@@ -7,6 +7,7 @@ import { UsersRepository } from '__repositories/knex/users-repository'
 import { AddMember } from '__use-cases/group-members/add-member'
 import { LeaveTheGroup } from '__use-cases/group-members/leave-the-group'
 import { RemoveMember } from '__use-cases/group-members/remove-member'
+import { TransferGroupAdministration } from '__use-cases/group-members/transfer-group-administration'
 import { RouteNotFoundError } from '__utils/errors/route-not-found'
 
 export async function addMember(request: FastifyRequest, reply: FastifyReply) {
@@ -82,4 +83,24 @@ export async function leaveTheGroup(
   })
 
   return reply.status(204).send()
+}
+
+export async function transfer(request: FastifyRequest, reply: FastifyReply) {
+  const params = z
+    .object({ groupId: z.string().uuid() })
+    .safeParse(request.params)
+
+  if (!params.success) throw new RouteNotFoundError()
+
+  const body = z.object({ memberId: z.string().uuid() }).parse(request.body)
+  const groupMembersRepository = new GroupMembersRepository()
+  const useCase = new TransferGroupAdministration(groupMembersRepository)
+
+  const { groupAdmin } = await useCase.execute({
+    groupId: params.data.groupId,
+    memberId: body.memberId,
+    sessionUserId: request.sessionUserId!,
+  })
+
+  return reply.status(200).send({ groupAdmin })
 }
