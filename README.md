@@ -30,12 +30,14 @@ git clone https://github.com/filipewelton/messenger-api.git
 npm install
 ```
 
-3. Crie o arquivo de variáveis de ambiente na raiz do projeto, copie o conteúdo do
-arquivo `.env.example` para este novo arquivo, e preencha os valores das variáveis de
+3. Crie os arquivos de variáveis de ambiente na raiz do projeto, copie o conteúdo do
+arquivo `.env.example` para estes novos arquivos, e preencha os valores das variáveis de
 ambiente:
 ```bash
 touch .env
+touch .env.test
 cat .env.example >> .env
+cat .env.example >>  .env.test
 ```
 
 4. Inicie os containers do docker:
