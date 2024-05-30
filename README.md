@@ -35,7 +35,7 @@ arquivo `.env.example` para este novo arquivo, e preencha os valores das variáv
 ambiente:
 ```bash
 touch .env
-cat .env.example > .env
+cat .env.example >> .env
 ```
 
 4. Inicie os containers do docker:
