@@ -1,22 +1,23 @@
 # Messenger API
 
-Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações de troca de messages.
+Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações de troca de mensagens.
 
 ## Funcionalidades Implementadas
 
-- Criação de usuário
-- Login (apenas Github)
-- Exclusão de conta
-- Atualização de conta
-- Envio de convites de amizade
-- Aceitação ou rejeição de convites
-- Criação de grupos
-- Exclusão de grupos
-- Atualização de grupo
-- Adição de membros ao grupo
-- Remoção de membros do grupo
-- Transferência da administração do grupo
-- Saída do grupo
+✅ Criação de usuário
+✅ Login (apenas Github)
+✅ Exclusão de conta
+✅ Atualização de conta
+✅ Envio de convites de amizade
+✅ Aceitação ou rejeição de convites
+✅ Criação de grupos
+✅ Exclusão de grupos
+✅ Atualização de grupo
+✅ Adição de membros ao grupo
+✅ Remoção de membros do grupo
+✅ Transferência da administração do grupo
+✅ Saída do grupo
+❌ Envio e recebimento de mensagens
 
 # Como Executar
 
