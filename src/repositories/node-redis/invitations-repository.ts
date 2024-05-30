@@ -8,9 +8,11 @@ import {
 
 export class InvitationsRepository extends Repository {
   async create(params: CreationParams): Promise<Invitation> {
+    const { recipientId, senderId } = params
+
     if (!this.connection) await this.startConnection()
 
-    const id = `${params.senderId}:${params.recipientId}`
+    const id = `${senderId}:${recipientId}`
     const hasSameKey = await this.connection.keys(id)
 
     if (hasSameKey.length !== 0) {

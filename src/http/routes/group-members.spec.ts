@@ -29,7 +29,7 @@ describe('Adding member to the group', () => {
   it('should be able to add a member to the group', async () => {
     const { id: groupId } = await createGroup({ repository: groupsRepository })
     const sessionUserId = faker.string.uuid()
-    const { cookie } = createSession({ userId: sessionUserId })
+    const { bearerToken } = createSession({ userId: sessionUserId })
 
     await createGroupMember({
       groupId,
@@ -42,7 +42,7 @@ describe('Adding member to the group', () => {
 
     const { status, body } = await supertest(app.server)
       .post(`/groups/${groupId}/members`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
       .send({ userId })
 
     expect(status).toEqual(201)
@@ -60,7 +60,7 @@ describe('Removing member to the group', () => {
   it('should be able to remove a member to the group', async () => {
     const { id: groupId } = await createGroup({ repository: groupsRepository })
     const sessionUserId = faker.string.uuid()
-    const { cookie } = createSession({ userId: sessionUserId })
+    const { bearerToken } = createSession({ userId: sessionUserId })
 
     await createGroupMember({
       groupId,
@@ -80,7 +80,7 @@ describe('Removing member to the group', () => {
 
     const { status } = await supertest(app.server)
       .delete(`/groups/${groupId}/members/${memberId}`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
 
     expect(status).toEqual(204)
   })
@@ -90,7 +90,7 @@ describe('Leave the group', () => {
   it('should be able to leave the group', async () => {
     const { id: groupId } = await createGroup({ repository: groupsRepository })
     const sessionUserId = faker.string.uuid()
-    const { cookie } = createSession({ userId: sessionUserId })
+    const { bearerToken } = createSession({ userId: sessionUserId })
 
     await createGroupMember({
       groupId,
@@ -101,7 +101,7 @@ describe('Leave the group', () => {
 
     const { status } = await supertest(app.server)
       .delete(`/groups/${groupId}/members/leave`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
       .send({ groupId })
 
     expect(status).toEqual(204)
@@ -112,7 +112,7 @@ describe('Group administration transfer', () => {
   it('should be able to transfer group administration', async () => {
     const { id: groupId } = await createGroup({ repository: groupsRepository })
     const sessionUserId = faker.string.uuid()
-    const { cookie } = createSession({ userId: sessionUserId })
+    const { bearerToken } = createSession({ userId: sessionUserId })
 
     await createGroupMember({
       groupId,
@@ -130,7 +130,7 @@ describe('Group administration transfer', () => {
 
     const { status, body } = await supertest(app.server)
       .patch(`/groups/${groupId}/members/transfer`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
       .send({ memberId })
 
     expect(status).toEqual(200)

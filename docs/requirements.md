@@ -12,11 +12,8 @@
 - [x] Deve ser possível atualizar as informações do grupo;
 - [x] Deve ser possível adicionar usuário a um grupo;
 - [x] Deve ser possível remover um usuário de um grupo;
-- [ ] Deve ser possível transferir a administração de um grupo para outro usuário;
+- [x] Deve ser possível transferir a administração de um grupo para outro usuário;
 - [x] Deve ser possível sair de um grupo;
-- [ ] Deve ser possível enviar mensagens de texto;
-- [ ] Deve ser possível enviar arquivos;
-- [ ] Deve ser possível identificar o status de uma mensagem;
 
 # Regras de Negócio
 
@@ -27,12 +24,8 @@
 - [x] Apenas o administrador pode atualizar as informações do grupo;
 - [x] Apenas o administrador pode adicionar usuários ao grupo;
 - [x] Apenas o administrador pode remover usuários do grupo;
-- [ ] Deve ser possível sair de um grupo apenas quando o usuário não for o administrador
+- [x] Deve ser possível sair de um grupo apenas quando o usuário não for o administrador
   do grupo;
-- [ ] As mensagens de texto devem ter no máximo 4096 caracteres;
-- [ ] Tamanho de um arquivo deve ter no máximo 1GB;
-- [ ] Apenas arquivos do tipo PNG, JPG, GIF, SVG, PDF, MP3, MP4 devem ser aceitos;
-- [ ] As mensagens deve ter os seguintes status: envido, recebido, lido;
 
 # Requisitos Não-funcionais
 

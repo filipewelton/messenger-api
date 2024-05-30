@@ -5,9 +5,7 @@ import { env } from '__libs/environment'
 import { UnauthorizedError } from '__utils/errors/unauthorized'
 
 export async function validateAccessToken(request: FastifyRequest) {
-  const token =
-    request.headers.cookie?.split(';')[0]?.replace(/^(access_token)[=]/, '') ??
-    ''
+  const token = request.headers.authorization?.replace('Bearer ', '') ?? ''
 
   try {
     const payload = verify(token, env.JWT_SECRET, {

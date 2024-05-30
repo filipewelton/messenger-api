@@ -20,7 +20,7 @@ afterAll(async () => await app.close())
 
 describe('Session creation', () => {
   it('should be able to create', async () => {
-    const { status, body, header } = await supertest(app.server).get(
+    const { status, body } = await supertest(app.server).get(
       '/users/sessions/callback?provider=github',
     )
 
@@ -35,7 +35,7 @@ describe('Session creation', () => {
       provider: 'github',
     })
 
-    expect(header['set-cookie']).toHaveLength(1)
+    expect(body.sessionToken).toEqual(expect.any(String))
   })
 })
 
@@ -43,11 +43,11 @@ describe('User update', () => {
   it('should be able to update', async () => {
     const repository = new UsersRepository()
     const { id, avatar } = await createUser({ repository })
-    const { cookie } = createSession()
+    const { bearerToken } = createSession()
 
     const { status, body } = await supertest(app.server)
       .patch(`/users/${id}`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
       .send({ avatar: faker.internet.url() })
 
     expect(status).toEqual(200)
@@ -69,9 +69,11 @@ describe('User deleting', () => {
   it('should be able to delete', async () => {
     const repository = new UsersRepository()
     const { id } = await createUser({ repository })
-    const { cookie } = createSession()
+    const { bearerToken } = createSession()
 
-    await supertest(app.server).delete(`/users/${id}`).set('Cookie', cookie)
+    await supertest(app.server)
+      .delete(`/users/${id}`)
+      .set('Authorization', bearerToken)
   })
 })
 
@@ -82,7 +84,7 @@ describe('Removing user from contacts', () => {
     const contactsRepository = new ContactsRepository()
     const { id: user1Id } = await createUser({ repository: usersRepository })
     const { id: user2Id } = await createUser({ repository: usersRepository })
-    const { cookie } = createSession({ userId: user1Id })
+    const { bearerToken } = createSession({ userId: user1Id })
 
     const { id: contactId } = await createContact({
       repository: contactsRepository,
@@ -102,7 +104,7 @@ describe('Removing user from contacts', () => {
 
     const { status } = await supertest(app.server)
       .delete(`/users/contacts/${contactId}`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
 
     expect(status).toEqual(204)
   })

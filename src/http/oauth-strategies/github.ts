@@ -2,6 +2,8 @@ import oauth2, { FastifyOAuth2Options } from '@fastify/oauth2'
 
 import { env } from '__libs/environment'
 
+const baseURL = `http://${env.HOST}:${env.PORT}`
+
 export const githubStrategy: FastifyOAuth2Options = {
   name: 'githubStrategy',
   credentials: {
@@ -11,7 +13,7 @@ export const githubStrategy: FastifyOAuth2Options = {
     },
     auth: oauth2.GITHUB_CONFIGURATION,
   },
-  startRedirectPath: '/users/sessions',
-  callbackUri: 'http://localhost:3000/users/sessions/callback?provider=github',
+  startRedirectPath: '/users/sessions/github',
+  callbackUri: `${baseURL}/users/sessions/callback?provider=github`,
   scope: ['profile', 'email'],
 }

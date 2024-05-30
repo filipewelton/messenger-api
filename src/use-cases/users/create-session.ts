@@ -38,11 +38,11 @@ export class CreateUserSession implements UseCase {
       user = userWithSameEmail
     }
 
-    const accessToken = sign({ userId: user.id }, env.JWT_SECRET, {
+    const sessionToken = sign({ userId: user.id }, env.JWT_SECRET, {
       algorithm: 'HS256',
       expiresIn: '7d',
     })
 
-    return { user, accessToken }
+    return { user, sessionToken }
   }
 }

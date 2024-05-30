@@ -1,5 +1,7 @@
 import cookies from '@fastify/cookie'
 import oauth2 from '@fastify/oauth2'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
 import fastify from 'fastify'
 import { ZodError } from 'zod'
 
@@ -13,6 +15,39 @@ import { invitationsRoutes } from './routes/invitations'
 import { usersRoutes } from './routes/users'
 
 const app = fastify()
+
+app.register(fastifySwagger, {
+  mode: 'static',
+  specification: {
+    path: './api-documentation.yaml',
+    postProcessor: function (swaggerObject) {
+      return swaggerObject
+    },
+    baseDir: './',
+  },
+})
+
+app.register(fastifySwaggerUi, {
+  routePrefix: '/docs',
+  uiConfig: {
+    docExpansion: 'full',
+    deepLinking: false,
+  },
+  uiHooks: {
+    onRequest: function (request, reply, next) {
+      next()
+    },
+    preHandler: function (request, reply, next) {
+      next()
+    },
+  },
+  staticCSP: true,
+  transformStaticCSP: (header) => header,
+  transformSpecification: (swaggerObject) => {
+    return swaggerObject
+  },
+  transformSpecificationClone: true,
+})
 
 app.register(cookies)
 app.register(oauth2, githubStrategy)

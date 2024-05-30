@@ -24,11 +24,11 @@ afterAll(async () => await app.close())
 describe('Group creation', () => {
   it('should be able to create group', async () => {
     const { id: userId } = await createUser({ repository: usersRepository })
-    const { cookie } = createSession({ userId })
+    const { bearerToken } = createSession({ userId })
 
     const { status, body } = await supertest(app.server)
       .post('/groups')
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
       .send({ name: faker.lorem.words() })
 
     expect(status).toEqual(201)
@@ -46,7 +46,7 @@ describe('Group creation', () => {
 describe('Group deletion', () => {
   it('should be able to delete group', async () => {
     const { id: userId } = await createUser({ repository: usersRepository })
-    const { cookie } = createSession({ userId })
+    const { bearerToken } = createSession({ userId })
     const groupsRepository = new GroupsRepository()
     const groupMemberRepository = new GroupMembersRepository()
     const { id: groupId } = await createGroup({ repository: groupsRepository })
@@ -59,7 +59,7 @@ describe('Group deletion', () => {
 
     const { status } = await supertest(app.server)
       .delete(`/groups/${groupId}`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
 
     expect(status).toEqual(204)
   })
@@ -68,7 +68,7 @@ describe('Group deletion', () => {
 describe('Group update', () => {
   it('should be able to update group', async () => {
     const { id: userId } = await createUser({ repository: usersRepository })
-    const { cookie } = createSession({ userId })
+    const { bearerToken } = createSession({ userId })
     const groupsRepository = new GroupsRepository()
     const groupMemberRepository = new GroupMembersRepository()
     const { id: groupId } = await createGroup({ repository: groupsRepository })
@@ -84,7 +84,7 @@ describe('Group update', () => {
 
     const { status, body } = await supertest(app.server)
       .patch(`/groups/${groupId}`)
-      .set('Cookie', cookie)
+      .set('Authorization', bearerToken)
       .send({ name, cover, description })
 
     expect(status).toEqual(200)

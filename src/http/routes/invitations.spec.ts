@@ -12,6 +12,7 @@ import {
 
 import { MessageBroker } from '__amqp/message-broker'
 import { app } from '__http/app'
+import { startCacheConnection } from '__libs/cache'
 import { UsersRepository } from '__repositories/knex/users-repository'
 import { InvitationsRepository } from '__repositories/node-redis/invitations-repository'
 import { createInvitation } from '__tests/factories/invitation-creation'
@@ -34,7 +35,12 @@ beforeEach(async () => {
 
 afterEach(async () => await messageBroker.close())
 
-afterAll(async () => await app.close())
+afterAll(async () => {
+  await app.close()
+
+  const cache = await startCacheConnection()
+  await cache.flushAll()
+})
 
 describe('Invitation creation', () => {
   it('should be able to create', async () => {
@@ -47,7 +53,7 @@ describe('Invitation creation', () => {
     })
 
     const content = faker.lorem.words()
-    const { cookie } = createSession()
+    const { bearerToken } = createSession()
     const resolver = (invitation: string) => expect(invitation).toEqual(content)
 
     await messageBroker.receive({
@@ -56,11 +62,12 @@ describe('Invitation creation', () => {
     })
 
     const { body } = await supertest(app.server)
-      .post(`/invitations/${senderUserId}`)
-      .set('Cookie', cookie)
+      .post(`/invitations`)
+      .set('Authorization', bearerToken)
       .send({
-        recipientId: recipientUserId,
         content,
+        senderId: senderUserId,
+        recipientId: recipientUserId,
       })
 
     expect(body.invitation).toEqual({
@@ -81,7 +88,7 @@ describe('Invitation acceptance', () => {
       repository: usersRepository,
     })
 
-    const { cookie } = createSession({ userId: recipientId })
+    const { bearerToken } = createSession({ userId: recipientId })
 
     await createInvitation({
       recipientId,
@@ -90,9 +97,9 @@ describe('Invitation acceptance', () => {
     })
 
     const { status, body } = await supertest(app.server)
-      .post('/invitations/acceptance')
-      .set('Cookie', cookie)
-      .send({ recipientId, senderId })
+      .post(`/invitations/${senderId}`)
+      .set('Authorization', bearerToken)
+      .send({ senderId })
 
     expect(status).toEqual(201)
 
@@ -112,7 +119,7 @@ describe('Invitation rejection', () => {
       repository: usersRepository,
     })
 
-    const { cookie } = createSession({ userId: recipientId })
+    const { bearerToken } = createSession({ userId: recipientId })
     const resolver = (msg: string) =>
       expect(msg).toEqual(`<${recipientId}> rejected his invitation!`)
 
@@ -125,8 +132,8 @@ describe('Invitation rejection', () => {
     await messageBroker.receive({ recipientId, resolver })
 
     const { status } = await supertest(app.server)
-      .delete('/invitations/acceptance')
-      .set('Cookie', cookie)
+      .delete(`/invitations/${senderId}`)
+      .set('Authorization', bearerToken)
       .send({ recipientId, senderId })
 
     expect(status).toEqual(204)

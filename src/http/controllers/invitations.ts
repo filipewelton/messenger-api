@@ -8,19 +8,11 @@ import { InvitationsRepository } from '__repositories/node-redis/invitations-rep
 import { AcceptInvitation } from '__use-cases/invitations/accept-invitation'
 import { CreateInvitation } from '__use-cases/invitations/create-invitation'
 import { RejectInvitation } from '__use-cases/invitations/reject-invitation'
-import { RouteNotFoundError } from '__utils/errors/route-not-found'
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
-  const params = z
-    .object({
-      id: z.string().uuid(),
-    })
-    .safeParse(request.params)
-
-  if (!params.success) throw new RouteNotFoundError()
-
   const body = z
     .object({
+      senderId: z.string().uuid(),
       recipientId: z.string().uuid(),
       content: z.string().max(50),
     })
@@ -42,19 +34,14 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
   const { invitation } = await useCase.execute({
     ...body,
-    senderId: params.data.id,
+    senderId: body.senderId,
   })
 
   return reply.status(201).send({ invitation })
 }
 
 export async function accept(request: FastifyRequest, reply: FastifyReply) {
-  const body = z
-    .object({
-      senderId: z.string().uuid(),
-    })
-    .parse(request.body)
-
+  const params = z.object({ senderId: z.string().uuid() }).parse(request.body)
   const usersRepository = new UsersRepository()
   const contactsRepository = new ContactsRepository()
   const invitationsRepository = new InvitationsRepository()
@@ -67,19 +54,14 @@ export async function accept(request: FastifyRequest, reply: FastifyReply) {
 
   const { contact } = await acceptInvitation.execute({
     recipientId: request.sessionUserId!,
-    senderId: body.senderId,
+    senderId: params.senderId,
   })
 
   return reply.status(201).send({ contact })
 }
 
 export async function reject(request: FastifyRequest, reply: FastifyReply) {
-  const body = z
-    .object({
-      senderId: z.string().uuid(),
-    })
-    .parse(request.body)
-
+  const params = z.object({ senderId: z.string().uuid() }).parse(request.body)
   const usersRepository = new UsersRepository()
   const invitationsRepository = new InvitationsRepository()
   const amqp = new MessageBroker()
@@ -94,7 +76,7 @@ export async function reject(request: FastifyRequest, reply: FastifyReply) {
 
   await rejectInvitation.execute({
     recipientId: request.sessionUserId!,
-    senderId: body.senderId,
+    senderId: params.senderId,
   })
 
   return reply.status(204).send()

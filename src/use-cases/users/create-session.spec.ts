@@ -16,12 +16,12 @@ beforeEach(() => {
 })
 
 it('should be able to create', async () => {
-  const { user, accessToken } = await useCase.execute({
+  const { user, sessionToken } = await useCase.execute({
     provider: 'github',
     request: {} as FastifyRequest,
   })
 
-  expect(accessToken).toEqual(expect.any(String))
+  expect(sessionToken).toEqual(expect.any(String))
 
   expect(user).toEqual({
     id: expect.any(String),

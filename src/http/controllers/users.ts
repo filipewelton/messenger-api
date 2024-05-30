@@ -22,17 +22,12 @@ export async function createSession(
   const repository = new UsersRepository()
   const createUserSession = new CreateUserSession(repository)
 
-  const { user, accessToken } = await createUserSession.execute({
+  const { user, sessionToken } = await createUserSession.execute({
     request,
     provider: queries.data.provider,
   })
 
-  const maxAge = 60 * 60 * 24 * 7 // 7 days
-
-  return reply
-    .status(201)
-    .setCookie('access_token', accessToken, { maxAge })
-    .send({ user })
+  return reply.status(201).send({ user, sessionToken })
 }
 
 export async function update(request: FastifyRequest, reply: FastifyReply) {

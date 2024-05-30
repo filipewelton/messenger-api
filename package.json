@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx --watch-path . src/server.ts",
     "knex": "node --import tsx ./node_modules/.bin/knex",
     "knex:test": "NODE_ENV=test node --import tsx ./node_modules/.bin/knex",
     "test": "vitest",
@@ -35,11 +35,12 @@
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
     "@fastify/oauth2": "7.8.1",
+    "@fastify/swagger": "8.14.0",
+    "@fastify/swagger-ui": "3.0.0",
     "amqplib": "0.10.4",
     "axios": "1.6.8",
     "bcryptjs": "2.4.3",
     "dotenv": "^16.4.5",
-    "fake-storage-service": "github:filipewelton/fake-storage-service",
     "fastify": "^4.26.2",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",

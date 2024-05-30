@@ -8,13 +8,13 @@ interface Params {
 }
 
 export function createSession(params?: Params) {
-  const accessToken = sign(
+  const sessionToken = sign(
     {
       userId: params?.userId ?? faker.string.uuid(),
     },
     env.JWT_SECRET,
     { algorithm: 'HS256' },
   )
-  const cookie = [`access_token=${accessToken}`]
-  return { cookie }
+  const bearerToken = `Bearer ${sessionToken}`
+  return { bearerToken }
 }
