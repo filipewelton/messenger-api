@@ -17,7 +17,8 @@ Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações 
 ✅ Remoção de membros do grupo<br>
 ✅ Transferência da administração do grupo<br>
 ✅ Saída do grupo<br>
-❌ Envio e recebimento de mensagens
+❌ Envio e recebimento de mensagens de texto
+❌ Envio e recebimento de arquivos
 
 ## Como Executar
 
