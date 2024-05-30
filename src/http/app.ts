@@ -19,7 +19,7 @@ const app = fastify()
 app.register(fastifySwagger, {
   mode: 'static',
   specification: {
-    path: './api-documentation.yaml',
+    path: './docs/api-specification.yaml',
     postProcessor: function (swaggerObject) {
       return swaggerObject
     },
