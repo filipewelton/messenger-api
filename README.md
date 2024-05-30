@@ -1,7 +1,6 @@
 # Messenger API
 
-Aplicação de troca de mensagens. Este projeto tem a pretensão de imitar algumas
-funcionalidades de aplicações de troca de messages.
+Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações de troca de messages.
 
 ## Funcionalidades Implementadas
 
