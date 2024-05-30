@@ -5,7 +5,7 @@ Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações 
 ## Funcionalidades Implementadas
 
 - Criação de usuário
-- Login
+- Login (apenas Github)
 - Exclusão de conta
 - Atualização de conta
 - Envio de convites de amizade
