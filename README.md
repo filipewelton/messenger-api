@@ -2,24 +2,24 @@
 
 Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações de troca de mensagens.
 
-## Funcionalidades Implementadas
+## Funcionalidades
 
-✅ Criação de usuário
-✅ Login (apenas Github)
-✅ Exclusão de conta
-✅ Atualização de conta
-✅ Envio de convites de amizade
-✅ Aceitação ou rejeição de convites
-✅ Criação de grupos
-✅ Exclusão de grupos
-✅ Atualização de grupo
-✅ Adição de membros ao grupo
-✅ Remoção de membros do grupo
-✅ Transferência da administração do grupo
-✅ Saída do grupo
+✅ Criação de usuário<br>
+✅ Login (apenas Github)<br>
+✅ Exclusão de conta<br>
+✅ Atualização de conta<br>
+✅ Envio de convites de amizade<br>
+✅ Aceitação ou rejeição de convites<br>
+✅ Criação de grupos<br>
+✅ Exclusão de grupos<br>
+✅ Atualização de grupo<br>
+✅ Adição de membros ao grupo<br>
+✅ Remoção de membros do grupo<br>
+✅ Transferência da administração do grupo<br>
+✅ Saída do grupo<br>
 ❌ Envio e recebimento de mensagens
 
-# Como Executar
+## Como Executar
 
 1. Clone o repositório:
 ```bash
@@ -66,7 +66,7 @@ que foi definido na variável de ambiente `PORT`.
 - Banco de dados: Sqlite, Redis
 - Corretor de mensagens: RabbitMQ
 
-## Informações
+## Observações
 
-- As funcionalidades e regras de negócio estão detalhas neste [arquivo](https://github.com/filipewelton/messenger-api/blob/main/docs/requirements.md);
-- A ferramenta utilizada para especificação da API foi o Swagger;
+- As funcionalidades e regras de negócio estão detalhadas neste [arquivo](https://github.com/filipewelton/messenger-api/blob/main/docs/requirements.md);
+- A ferramenta utilizada para criação de especificações de API foi o Swagger;
