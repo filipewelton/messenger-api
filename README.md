@@ -22,7 +22,7 @@ Este projeto tem a pretensão de imitar algumas funcionalidades de aplicações 
 
 1. Clone o repositório:
 ```bash
-https://github.com/filipewelton/messenger-api.git
+git clone https://github.com/filipewelton/messenger-api.git
 ```
 
 2. Instale as dependências:
